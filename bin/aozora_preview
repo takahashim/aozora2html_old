@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+# -*- coding:utf-8 -*-
+
+require 'aozora2html'
+require 'tempfile'
+require 'webrick'
+
+s = WEBrick::HTTPServer.new :Port => 8000
+s.mount_proc '/' do |req, res|
+  if req.path.length > 1
+    url = 'http://www.aozora.gr.jp/cards' + req.path
+    res.set_redirect WEBrick::HTTPStatus::MovedPermanently, url
+  else
+    input = ARGV[0]
+    output = Tempfile.new 'aozora_preview'
+    Aozora2Html.new(input, output).process
+    output.rewind
+    res.body = output.read
+    output.close
+    output.unlink
+  end
+end
+trap("INT"){s.shutdown}
+s.start
