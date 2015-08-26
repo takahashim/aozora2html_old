@@ -812,7 +812,12 @@ class Aozora2Html
   def initialize (input, output)
     @stream = Jstream.new(File.open(input,"r:Shift_JIS"))
     @buffer = []; @ruby_buf = [""]; @ruby_char_type = nil
-    @out = File.open(output,"w"); @section = :head; @header = []; @style_stack = []
+    if output.is_a? IO
+      @out = output
+    else
+      @out = File.open(output,"w")
+    end
+    @section = :head; @header = []; @style_stack = []
     @chuuki_table = {}; @images = []; @indent_stack = []; @tag_stack = []
     @midashi_id = 0; @terprip = true
     @endchar = :eof
